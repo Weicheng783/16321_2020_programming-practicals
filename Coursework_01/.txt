@@ -1,0 +1,8 @@
+< Statistics Summary >
+the total number of words : 1 words
+the number of words spelt correctly : 1 words
+the number of incorrectly spelt words : 0 words
+the number of words added to the dictionary : 0 words
+the number of words changed by the user accepting the suggested word : 1 words
+Original input: hasidhjad you
+Final result: hasidhjad you
