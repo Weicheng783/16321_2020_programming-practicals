@@ -11,11 +11,11 @@ def start():
         messagebox.showinfo(title='', message='Please type your name correctly！')
         # playername.set('you hit me')
     else:
-    	global canvas, pball, direction, balls, foodcoord, xl, yl, xr, yr, scoreText, score, start
+    	global canvas, pball, direction, balls, foodcoord, xl, yl, xr, yr, scoreText, score, start, xy
 
     	canvas = Canvas(mainwindow, width=1280, height=720)
     	canvas.pack()
-
+    	
     	start = 1
 
     	balls = []
@@ -29,7 +29,7 @@ def start():
     	balls.append(pball)
 
     	player = canvas.create_text( 1280/2 , 10 , fill="white" , font="Times 20 italic bold", text="PLAYER: " + playername.get())
-    	canvas.config(bg="black")
+    	canvas.config(bg="black") 
     	score = 0
     	txt = "Score:" + str(score)
     	scoreText = canvas.create_text( 1280/1.5 , 10 , fill="white" , font="Times 20 italic bold", text=txt)
@@ -43,11 +43,11 @@ def start():
     	canvas.focus_set()
     	direction = "right"
     	# return canvas
-
+    	
     	placeFood()
     	canvas.bind("<KeyPress>", call_back)
     	# print(foodcoord)
-
+    	
     	canvas.after(90, moveBall)
     	# print(str(balls[0]))
     	# moveBall()
@@ -87,7 +87,7 @@ def overlapping(a,b):
     return False
 
 def moveBall():
-	global moveBall, direction, balls, xl, yl, xr, yr, food, score, scoreText
+	global moveBall, direction, balls, xl, yl, xr, yr, food, score, scoreText, pball, growth, xy
 	canvas.pack()
 	# foodlenbef = len(foodcoordx)
 	# fooddel = []
@@ -100,15 +100,30 @@ def moveBall():
 			score = score + 10
 			txt = "Score:" + str(score)
 			canvas.itemconfigure(scoreText, text=txt)
-			break
+			canvas.delete(pball)
+			balls = []
 
+			growth = 3
+
+			xy = (xl -growth,yl -growth,xr +growth,yr +growth)
+			# xy = (1280/2 -growth,720/2 -growth,1280/2 +growth,720/2 +growth)
+
+			xl=xy[0]
+			yl=xy[1]
+			xr=xy[2]
+			yr=xy[3]
+			# print(xy[0])
+			pball=canvas.create_oval(xy, fill="green", activefill="red")
+			balls.append(pball)
+			# canvas.scale(pball, (xr-xl)/2, (yr-yl)/2, 1.1, 1.1)
+			break
 	if len(foodcoordx) < 10:
 		placeFood()
 	# foodlenaft = len(foodcoordx)
 	# foodlendiff = foodlenbef - foodlenaft
-
-
-
+	
+		
+			
 
 	# positions = []
 	# positions.append(canvas.coords(balls[0]))
@@ -124,22 +139,22 @@ def moveBall():
     # positions.append(canvas.coords(snake[0]))
 	if direction == "left":
 		if xl > 10:
-		    canvas.move(1, -30,0)
+		    canvas.move(pball, -30,0)
 		    xl -= 30
 		    xr -= 30
 	elif direction == "right":
 	    if xr < 1270:
-		    canvas.move(1, 30,0)
+		    canvas.move(pball, 30,0)
 		    xl += 30
 		    xr += 30
 	elif direction == "up":
 		if yl > 10:
-		    canvas.move(1, 0,-30)
+		    canvas.move(pball, 0,-30)
 		    yl -= 30
 		    yr -= 30
 	elif direction == "down":
 		if yr < 710:
-		    canvas.move(1, 0,30)
+		    canvas.move(pball, 0,30)
 		    yl += 30
 		    yr += 30
 	# bHeadPos = canvas.coords(balls[0])
@@ -157,7 +172,7 @@ def moveBall():
 		positions.append(canvas.coords(balls[i]))
 	for i in range(len(balls)-1):
 		canvas.coords(balls[i+1],positions[i][0], positions[i][1],positions[i][2],positions[i][3])
-
+	
 	canvas.after(90, moveBall)
 
     # for i in range(1,len(snake)):
@@ -185,9 +200,9 @@ def placeFood():
     	foodY = rand(0,700)
     	foodcoordx.append(foodX)
     	foodcoordy.append(foodY)
-
+ 
     	canvas.move(food[i], foodX, foodY)
-
+    	
 
 def leftKey(event):
     global direction
@@ -225,3 +240,5 @@ foodcoord=[]
 
 
 mainwindow.mainloop()
+
+
