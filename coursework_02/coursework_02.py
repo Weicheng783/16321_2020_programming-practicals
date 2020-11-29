@@ -8,51 +8,60 @@ def start():
     # global start
 
     if playername.get() == '':
-        messagebox.showinfo(title='', message='Please type your name correctly！')
+        messagebox.showinfo(title='Ooops!Please Check the Following...', message='Please type your name correctly！')
         # playername.set('you hit me')
     else:
-    	global canvas, pball, direction, balls, foodcoord, xl, yl, xr, yr, scoreText, score, start, xy
+      if up.get()=='' or down.get()=='' or left.get()=='' or right.get()=='' or up.get()==' ' or down.get()==' ' or left.get()==' ' or right.get()==' ':
+        messagebox.showinfo(title='Ooops!Please Check the Following...', message='Please Set Your Customary Control Keys(CCKs) or the Keys are setted illegally！')
+      else:
+        global canvas, pball, direction, balls, foodcoord, xl, yl, xr, yr, scoreText, score, start, xy
 
-    	canvas = Canvas(mainwindow, width=1280, height=720)
-    	canvas.pack()
-    	
-    	start = 1
+        canvas = Canvas(mainwindow, width=1280, height=720)
+        canvas.pack()
 
-    	balls = []
-    	xy = (1280/2 -50,720/2 -50,1280/2 +50,720/2 +50)
-    	xl=xy[0]
-    	yl=xy[1]
-    	xr=xy[2]
-    	yr=xy[3]
-    	# print(xy[0])
-    	pball=canvas.create_oval(xy, fill="green", activefill="red")
-    	balls.append(pball)
+        start = 1
 
-    	player = canvas.create_text( 1280/2 , 10 , fill="white" , font="Times 20 italic bold", text="PLAYER: " + playername.get())
-    	canvas.config(bg="black") 
-    	score = 0
-    	txt = "Score:" + str(score)
-    	scoreText = canvas.create_text( 1280/1.5 , 10 , fill="white" , font="Times 20 italic bold", text=txt)
+        balls = []
+        xy = (1280/2 -50,720/2 -50,1280/2 +50,720/2 +50)
+        xl=xy[0]
+        yl=xy[1]
+        xr=xy[2]
+        yr=xy[3]
+        # print(xy[0])
+        pball=canvas.create_oval(xy, fill="green", activefill="red")
+        balls.append(pball)
+
+        player = canvas.create_text( 1280/2 , 10 , fill="white" , font="Times 20 italic bold", text="PLAYER: " + playername.get())
+        canvas.config(bg="black") 
+        score = 0
+        txt = "Score:" + str(score)
+        scoreText = canvas.create_text( 1280/1.5 , 10 , fill="white" , font="Times 20 italic bold", text=txt)
 
 
-    	canvas.bind("<Left>", leftKey)
-    	canvas.bind("<Right>", rightKey)
-    	canvas.bind("<Up>", upKey)
-    	canvas.bind("<Down>", downKey)
-    	canvas.bind("<MouseWheel>",zoomer)
-    	canvas.focus_set()
-    	direction = "right"
-    	# return canvas
-    	
-    	placeFood()
-    	canvas.bind("<KeyPress>", call_back)
-    	# print(foodcoord)
-    	
-    	canvas.after(90, moveBall)
-    	# print(str(balls[0]))
-    	# moveBall()
-    	# sleep(5)
-    	# canvas.destroy()
+        canvas.bind("<Left>", leftKey)
+        canvas.bind("<Right>", rightKey)
+        canvas.bind("<Up>", upKey)
+        canvas.bind("<Down>", downKey)
+
+        canvas.bind("<"+left.get()+">", leftKey)
+        canvas.bind("<"+right.get()+">", rightKey)
+        canvas.bind("<"+up.get()+">", upKey)
+        canvas.bind("<"+down.get()+">", downKey)
+
+        canvas.bind("<MouseWheel>",zoomer)
+        canvas.focus_set()
+        direction = "right"
+        # return canvas
+
+        placeFood()
+        canvas.bind("<KeyPress>", call_back)
+        # print(foodcoord)
+
+        canvas.after(90, moveBall)
+        # print(str(balls[0]))
+        # moveBall()
+        # sleep(5)
+        # canvas.destroy()
 
 
 def zoomer(event):
@@ -230,9 +239,35 @@ Label(mainwindow,text='Battle Of Balls (adapted)', font=('Arial Bold', 20)).plac
 Label(mainwindow,text='Please Type Your Name :', font=('Arial Bold', 15)).place(x=350, y=250, anchor='nw')
 
 playername = StringVar()
+playername.set("Harvey")
+
+up = StringVar()
+up.set("w")
+
+down = StringVar()
+down.set("s")
+
+left = StringVar()
+left.set("a")
+
+right = StringVar()
+right.set("d")
+
 e = Entry(mainwindow, show=None, font=('Arial', 14), textvariable=playername).place(x=600, y=250, anchor='nw')
 # playername.set('you hit me')
 Button(mainwindow, text='Start !', font=('Arial', 12), width=10, height=1, command=start).place(x=600, y=350, anchor='nw')
+# User control
+Label(mainwindow,text='User Settings(Customary Control Keys):', font=('Arial Bold', 15)).place(x=500, y=720/2+50, anchor='nw')
+Label(mainwindow,text='UpKey :', font=('Arial Bold', 15)).place(x=450, y=440, anchor='nw')
+upk=Entry(mainwindow, show=None, font=('Arial', 14), textvariable=up).place(x=550, y=440, anchor='nw')
+Label(mainwindow,text='DownKey:', font=('Arial Bold', 15)).place(x=450, y=470, anchor='nw')
+downk=Entry(mainwindow, show=None, font=('Arial', 14), textvariable=down).place(x=570, y=470, anchor='nw')
+Label(mainwindow,text='LeftKey:', font=('Arial Bold', 15)).place(x=450, y=500, anchor='nw')
+leftk=Entry(mainwindow, show=None, font=('Arial', 14), textvariable=left).place(x=570, y=500, anchor='nw')
+Label(mainwindow,text='RightKey:', font=('Arial Bold', 15)).place(x=450, y=530, anchor='nw')
+rightk=Entry(mainwindow, show=None, font=('Arial', 14), textvariable=right).place(x=570, y=530, anchor='nw')
+Label(mainwindow,text='! Notice: The keys <Left> <Right> <Up> <Down> are kept unchanged intentationally afraid of the Customary Keys do not work.', font=('Arial Bold', 15)).place(x=40, y=570, anchor='nw')
+
 
 foodcoord=[]
 
