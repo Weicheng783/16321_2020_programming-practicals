@@ -8,18 +8,19 @@ def start():
     # global start
 
     if playername.get() == '':
-        messagebox.showinfo(title='Ooops!Please Check the Following...', message='Please type your name correctly！')
+        messagebox.showinfo(title='Ooops! Please Check the Following...', message='Please type your name correctly！')
         # playername.set('you hit me')
     else:
       if up.get()=='' or down.get()=='' or left.get()=='' or right.get()=='' or up.get()==' ' or down.get()==' ' or left.get()==' ' or right.get()==' ':
-        messagebox.showinfo(title='Ooops!Please Check the Following...', message='Please Set Your Customary Control Keys(CCKs) or the Keys are setted illegally！')
+        messagebox.showinfo(title='Ooops! Please Check the Following...', message='Please Set Your Customary Control Keys(CCKs) or the Keys are setted illegally！')
       else:
-        global canvas, pball, direction, balls, foodcoord, xl, yl, xr, yr, scoreText, score, start, xy
+        global canvas, pball, direction, balls, foodcoord, xl, yl, xr, yr, scoreText, score, start, xy, countdown, timermsg
 
         canvas = Canvas(mainwindow, width=1280, height=720)
         canvas.pack()
 
         start = 1
+        starttimer = 0
 
         balls = []
         xy = (1280/2 -50,720/2 -50,1280/2 +50,720/2 +50)
@@ -31,17 +32,19 @@ def start():
         pball=canvas.create_oval(xy, fill="green", activefill="red")
         balls.append(pball)
 
-        player = canvas.create_text( 1280/2 , 10 , fill="white" , font="Times 20 italic bold", text="PLAYER: " + playername.get())
-        canvas.config(bg="black") 
+        player = canvas.create_text( 1280/2-200 , 10 , fill="white" , font="Times 20 italic bold", text="PLAYER: " + playername.get())
+        canvas.config(bg="black")
         score = 0
         txt = "Score:" + str(score)
-        scoreText = canvas.create_text( 1280/1.5 , 10 , fill="white" , font="Times 20 italic bold", text=txt)
+        scoreText = canvas.create_text( 1280/2+50 , 10 , fill="white" , font="Times 20 italic bold", text=txt)
 
 
         canvas.bind("<Left>", leftKey)
         canvas.bind("<Right>", rightKey)
         canvas.bind("<Up>", upKey)
         canvas.bind("<Down>", downKey)
+
+        canvas.bind("<F10>", hide)
 
         canvas.bind("<"+left.get()+">", leftKey)
         canvas.bind("<"+right.get()+">", rightKey)
@@ -52,9 +55,14 @@ def start():
         canvas.focus_set()
         direction = "right"
         # return canvas
-
         placeFood()
         canvas.bind("<KeyPress>", call_back)
+        if starttimer == 0:
+            countdown = 30
+            starttimer = 1
+            timermsg = canvas.create_text( 1280/2 , 36 , fill="white" , font="Times 20 italic bold", text="Time Remaining for Next Update: "+str(countdown))
+            timer()
+        
         # print(foodcoord)
 
         canvas.after(90, moveBall)
@@ -62,6 +70,39 @@ def start():
         # moveBall()
         # sleep(5)
         # canvas.destroy()
+
+
+def timer():
+        global countdown, foodcoordx, foodcoordy, xl, xr, yr, yl, growth, pball
+        if countdown > 0:
+            for i in range (len(foodcoordx)):
+                if foodcoordx[i]-(xl+xr)/2 <= (xr-xl)/2 and foodcoordx[i]-(xl+xr)/2 >= -(xr-xl)/2 and foodcoordy[i]-(yl+yr)/2 <= (yr-yl)/2 and foodcoordy[i]-(yl+yr)/2 >= -(yr-yl)/2:
+                    break
+                else:
+                     if i == len(foodcoordx)-1:
+
+                      growth = -0.2
+                      if xr-xl <= 20:
+                       break
+                      else:
+                       canvas.delete(pball)
+                       balls = []
+                       xy = (xl -growth,yl -growth,xr +growth,yr +growth)
+                       xl=xy[0]
+                       yl=xy[1]
+                       xr=xy[2]
+                       yr=xy[3]
+                       pball=canvas.create_oval(xy, fill="green", activefill="red")
+                       break
+
+
+            canvas.itemconfigure(timermsg, text="Time Remaining for Next Update: "+str(countdown))
+            countdown -= 1
+        else:
+            countdown = 30
+        canvas.after(1000, timer)
+
+            
 
 
 def zoomer(event):
@@ -112,7 +153,7 @@ def moveBall():
 			canvas.delete(pball)
 			balls = []
 
-			growth = 3
+			growth = 0.3
 
 			xy = (xl -growth,yl -growth,xr +growth,yr +growth)
 			# xy = (1280/2 -growth,720/2 -growth,1280/2 +growth,720/2 +growth)
@@ -126,6 +167,8 @@ def moveBall():
 			balls.append(pball)
 			# canvas.scale(pball, (xr-xl)/2, (yr-yl)/2, 1.1, 1.1)
 			break
+		
+
 	if len(foodcoordx) < 10:
 		placeFood()
 	# foodlenaft = len(foodcoordx)
@@ -190,6 +233,18 @@ def moveBall():
     #     canvas.coords(snake[i+1],positions[i][0], positions[i][1],positions[i][2],positions[i][3])
     # if 'gameOver' not in locals():
 
+def hide(event):
+    global hider
+    if hider == 0:
+        hider=1
+        # mainwindow.withdraw()
+        bosskeydis = canvas.create_image(img=bosskey)
+    else:
+        hider=0
+        canvas.delete(bosskeydis)
+
+
+
 def call_back(event):
 	global call_back
 	print(event.keysym)
@@ -241,6 +296,8 @@ Label(mainwindow,text='Please Type Your Name :', font=('Arial Bold', 15)).place(
 playername = StringVar()
 playername.set("Harvey")
 
+hider = 0
+
 up = StringVar()
 up.set("w")
 
@@ -268,6 +325,7 @@ Label(mainwindow,text='RightKey:', font=('Arial Bold', 15)).place(x=450, y=530, 
 rightk=Entry(mainwindow, show=None, font=('Arial', 14), textvariable=right).place(x=570, y=530, anchor='nw')
 Label(mainwindow,text='! Notice: The keys <Left> <Right> <Up> <Down> are kept unchanged intentationally afraid of the Customary Keys do not work.', font=('Arial Bold', 15)).place(x=40, y=570, anchor='nw')
 
+# bosskey = PhotoImage(file="python.png")
 
 foodcoord=[]
 
