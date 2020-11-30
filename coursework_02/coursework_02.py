@@ -53,7 +53,7 @@ def start():
 
         canvas.bind("<p>", pause)
 
-        canvas.bind("<F10>", hide)
+        canvas.bind("<h>", hide)
 
         canvas.bind("<"+left.get()+">", leftKey)
         canvas.bind("<"+right.get()+">", rightKey)
@@ -322,14 +322,21 @@ def moveBall():
         # if 'gameOver' not in locals():
 
 def hide(event):
-    global hider
+    global hider, pause, canvashade
     if hider == 0:
         hider=1
+        pause=1
+        canvashade = Canvas(canvas, width=1280, height=720, bg='white')
+        canvashade.pack()
+        shademsg = canvashade.create_text( 1280/2 , 720/2 , fill="black" , font="Times 20 italic bold", text="Welcome to Python, You Pressed a BOSS KEY! Press again to restore." )
         # mainwindow.withdraw()
-        bosskeydis = canvas.create_image(img=bosskey)
+        # bosskeydis = canvas.create_image(img=bosskey)
     else:
         hider=0
-        canvas.delete(bosskeydis)
+        pause=0
+        canvashade.destroy()
+
+        # canvas.delete(bosskeydis)
 
 
 
