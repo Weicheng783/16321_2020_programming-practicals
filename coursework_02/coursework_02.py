@@ -51,6 +51,8 @@ def start():
         canvas.bind("<Up>", upKey)
         canvas.bind("<Down>", downKey)
 
+        canvas.bind("<p>", pause)
+
         canvas.bind("<F10>", hide)
 
         canvas.bind("<"+left.get()+">", leftKey)
@@ -58,7 +60,7 @@ def start():
         canvas.bind("<"+up.get()+">", upKey)
         canvas.bind("<"+down.get()+">", downKey)
 
-        canvas.bind("<MouseWheel>",zoomer)
+        # canvas.bind("<MouseWheel>",zoomer)
         canvas.focus_set()
         direction = "right"
         # return canvas
@@ -79,102 +81,118 @@ def start():
         # sleep(5)
         # canvas.destroy()
 
+def pause(event):
+    global pause, pausemsg
+    if pause == 0:
+        pause = 1
+        pausemsg = canvas.create_text( 1280/2 , 720/2 , fill="white" , font="Times 20 italic bold", text="The Game Is Paused, Press P to return." )
+    else:
+        canvas.delete(pausemsg)
+        pause = 0
+
+
 def movekiller():
     global killer, xlg, ylg, xrg, yrg, directiong, countdown
-    
-    if countdown != 0:
-        if directiong == 0 :#"left"
-            if xlg > 10:
-                canvas.move(killer, -30,0)
-                xlg -= 30
-                xrg -= 30
-            else:
-                canvas.delete(killer)
-                xlg = rand(100, 800)
-                ylg = xlg + 300
-                xrg = xlg + 100
-                yrg = xlg + 400
-                killerxy = (xlg,ylg,xrg,yrg)
-                killer=canvas.create_oval(killerxy, fill="orange")
-                directiong = rand(0, 3)
-        elif directiong == 1: #"right"
-            if xrg < 1270:
-                canvas.move(killer, 30,0)
-                xlg += 30
-                xrg += 30
-            else:
-                canvas.delete(killer)
-                xlg = rand(100, 800)
-                ylg = xlg + 300
-                xrg = xlg + 100
-                yrg = xlg + 400
-                killerxy = (xlg,ylg,xrg,yrg)
-                killer=canvas.create_oval(killerxy, fill="orange")
-                directiong = rand(0, 3)
-        elif directiong == 2: #"up"
-            if ylg > 10:
-                canvas.move(killer, 0,-30)
-                ylg -= 30
-                yrg -= 30
-            else:
-                canvas.delete(killer)
-                xlg = rand(100, 800)
-                ylg = xlg + 300
-                xrg = xlg + 100
-                yrg = xlg + 400
-                killerxy = (xlg,ylg,xrg,yrg)
-                killer=canvas.create_oval(killerxy, fill="orange")
-                directiong = rand(0, 3)
-        elif directiong == 3: #"down"
-            if yrg < 710:
-                canvas.move(killer, 0,30)
-                ylg += 30
-                yrg += 30
-            else:
-                canvas.delete(killer)
-                xlg = rand(100, 800)
-                ylg = xlg + 300
-                xrg = xlg + 100
-                yrg = xlg + 400
-                killerxy = (xlg,ylg,xrg,yrg)
-                killer=canvas.create_oval(killerxy, fill="orange")
-                directiong = rand(0, 3)
-    canvas.after(90, movekiller)
+    if pause == 1:
+        canvas.after(90, movekiller)
+    else:
+        if countdown != 0:
+            if directiong == 0 :#"left"
+                if xlg > 10:
+                    canvas.move(killer, -30,0)
+                    xlg -= 30
+                    xrg -= 30
+                else:
+                    canvas.delete(killer)
+                    xlg = rand(100, 800)
+                    ylg = xlg + 300
+                    xrg = xlg + 100
+                    yrg = xlg + 400
+                    killerxy = (xlg,ylg,xrg,yrg)
+                    killer=canvas.create_oval(killerxy, fill="orange")
+                    directiong = rand(0, 3)
+            elif directiong == 1: #"right"
+                if xrg < 1270:
+                    canvas.move(killer, 30,0)
+                    xlg += 30
+                    xrg += 30
+                else:
+                    canvas.delete(killer)
+                    xlg = rand(100, 800)
+                    ylg = xlg + 300
+                    xrg = xlg + 100
+                    yrg = xlg + 400
+                    killerxy = (xlg,ylg,xrg,yrg)
+                    killer=canvas.create_oval(killerxy, fill="orange")
+                    directiong = rand(0, 3)
+            elif directiong == 2: #"up"
+                if ylg > 10:
+                    canvas.move(killer, 0,-30)
+                    ylg -= 30
+                    yrg -= 30
+                else:
+                    canvas.delete(killer)
+                    xlg = rand(100, 800)
+                    ylg = xlg + 300
+                    xrg = xlg + 100
+                    yrg = xlg + 400
+                    killerxy = (xlg,ylg,xrg,yrg)
+                    killer=canvas.create_oval(killerxy, fill="orange")
+                    directiong = rand(0, 3)
+            elif directiong == 3: #"down"
+                if yrg < 710:
+                    canvas.move(killer, 0,30)
+                    ylg += 30
+                    yrg += 30
+                else:
+                    canvas.delete(killer)
+                    xlg = rand(100, 800)
+                    ylg = xlg + 300
+                    xrg = xlg + 100
+                    yrg = xlg + 400
+                    killerxy = (xlg,ylg,xrg,yrg)
+                    killer=canvas.create_oval(killerxy, fill="orange")
+                    directiong = rand(0, 3)
+        canvas.after(90, movekiller)
 
 
 
 def timer():
-        global countdown, foodcoordx, foodcoordy, xl, xr, yr, yl, growth, pball, directiong
-        if countdown > 0:
-            # boom()
-            for i in range (len(foodcoordx)):
-                if foodcoordx[i]-(xl+xr)/2 <= (xr-xl)/2 and foodcoordx[i]-(xl+xr)/2 >= -(xr-xl)/2 and foodcoordy[i]-(yl+yr)/2 <= (yr-yl)/2 and foodcoordy[i]-(yl+yr)/2 >= -(yr-yl)/2:
-                    break
-                else:
-                     if i == len(foodcoordx)-1:
+        global countdown, foodcoordx, foodcoordy, xl, xr, yr, yl, growth, pball, directiong, pause
 
-                      growth = -0.2
-                      if xr-xl <= 35:
-                       break
-                      else:
-                       canvas.delete(pball)
-                       balls = []
-                       xy = (xl -growth,yl -growth,xr +growth,yr +growth)
-                       xl=xy[0]
-                       yl=xy[1]
-                       xr=xy[2]
-                       yr=xy[3]
-                       pball=canvas.create_oval(xy, fill="green")
-                       break
-
-
-            canvas.itemconfigure(timermsg, text="Time Remaining for Next Update: "+str(countdown))
-            countdown -= 1
+        if pause == 1:
+            canvas.after(90, timer)
         else:
-            # boomdir()
-            directiong = rand(0, 3)
-            countdown = 30
-        canvas.after(1000, timer)
+            if countdown > 0:
+                # boom()
+                for i in range (len(foodcoordx)):
+                    if foodcoordx[i]-(xl+xr)/2 <= (xr-xl)/2 and foodcoordx[i]-(xl+xr)/2 >= -(xr-xl)/2 and foodcoordy[i]-(yl+yr)/2 <= (yr-yl)/2 and foodcoordy[i]-(yl+yr)/2 >= -(yr-yl)/2:
+                        break
+                    else:
+                         if i == len(foodcoordx)-1:
+
+                          growth = -0.2
+                          if xr-xl <= 35:
+                           break
+                          else:
+                           canvas.delete(pball)
+                           balls = []
+                           xy = (xl -growth,yl -growth,xr +growth,yr +growth)
+                           xl=xy[0]
+                           yl=xy[1]
+                           xr=xy[2]
+                           yr=xy[3]
+                           pball=canvas.create_oval(xy, fill="green")
+                           break
+
+
+                canvas.itemconfigure(timermsg, text="Time Remaining for Next Update: "+str(countdown))
+                countdown -= 1
+            else:
+                # boomdir()
+                directiong = rand(0, 3)
+                countdown = 30
+            canvas.after(1000, timer)
 
  # newfile=open(newfilename+'.txt','w')          
 
@@ -197,13 +215,13 @@ def timer():
 #     killer=canvas.create_oval(killerxy, fill="orange")
 
 
-def zoomer(event):
-		global zoomer, xr, xl, yr, yl, pball, food
-		if (event.delta > 0):
-			canvas.scale("all", (xr-xl)/2, (yr-yl)/2, 1.1, 1.1)
-		elif (event.delta < 0):
-			canvas.scale("all", (xr-xl)/2, (yr-yl)/2, 0.9, 0.9)
-			canvas.configure(scrollregion = canvas.bbox("all"))
+# def zoomer(event):
+# 		global zoomer, xr, xl, yr, yl, pball, food
+# 		if (event.delta > 0):
+# 			canvas.scale("all", (xr-xl)/2, (yr-yl)/2, 1.1, 1.1)
+# 		elif (event.delta < 0):
+# 			canvas.scale("all", (xr-xl)/2, (yr-yl)/2, 0.9, 0.9)
+# 			canvas.configure(scrollregion = canvas.bbox("all"))
 
 
 def growSnake():
@@ -229,101 +247,79 @@ def overlapping(a,b):
     return False
 
 def moveBall():
-	global moveBall, direction, balls, xl, yl, xr, yr, food, score, scoreText, pball, growth, xy
-	canvas.pack()
-	# foodlenbef = len(foodcoordx)
-	# fooddel = []
-	for i in range (len(foodcoordx)):
-		if foodcoordx[i]-(xl+xr)/2 <= (xr-xl)/2 and foodcoordx[i]-(xl+xr)/2 >= -(xr-xl)/2 and foodcoordy[i]-(yl+yr)/2 <= (yr-yl)/2 and foodcoordy[i]-(yl+yr)/2 >= -(yr-yl)/2:
-			canvas.delete(food[i])
-			food.remove(food[i])
-			foodcoordx.remove(foodcoordx[i])
-			foodcoordy.remove(foodcoordy[i])
-			score = score + 10
-			txt = "Score:" + str(score)
-			canvas.itemconfigure(scoreText, text=txt)
-			canvas.delete(pball)
-			balls = []
+    global moveBall, direction, balls, xl, yl, xr, yr, food, score, scoreText, pball, growth, xy, pause
+    if pause == 1:
+     canvas.after(90, moveBall)
+    else:
+        canvas.pack()
+        # foodlenbef = len(foodcoordx)
+        # fooddel = []
+        for i in range (len(foodcoordx)):
+         if foodcoordx[i]-(xl+xr)/2 <= (xr-xl)/2 and foodcoordx[i]-(xl+xr)/2 >= -(xr-xl)/2 and foodcoordy[i]-(yl+yr)/2 <= (yr-yl)/2 and foodcoordy[i]-(yl+yr)/2 >= -(yr-yl)/2:
+            canvas.delete(food[i])
+            food.remove(food[i])
+            foodcoordx.remove(foodcoordx[i])
+            foodcoordy.remove(foodcoordy[i])
+            score = score + 10
+            txt = "Score:" + str(score)
+            canvas.itemconfigure(scoreText, text=txt)
+            canvas.delete(pball)
+            balls = []
 
-			growth = 0.6
+            growth = 0.6
 
-			xy = (xl -growth,yl -growth,xr +growth,yr +growth)
-			# xy = (1280/2 -growth,720/2 -growth,1280/2 +growth,720/2 +growth)
+            xy = (xl -growth,yl -growth,xr +growth,yr +growth)
+            # xy = (1280/2 -growth,720/2 -growth,1280/2 +growth,720/2 +growth)
 
-			xl=xy[0]
-			yl=xy[1]
-			xr=xy[2]
-			yr=xy[3]
-			# print(xy[0])
-			pball=canvas.create_oval(xy, fill="green")
-			balls.append(pball)
-			# canvas.scale(pball, (xr-xl)/2, (yr-yl)/2, 1.1, 1.1)
-			break
-		
+            xl=xy[0]
+            yl=xy[1]
+            xr=xy[2]
+            yr=xy[3]
+            # print(xy[0])
+            pball=canvas.create_oval(xy, fill="green")
+            balls.append(pball)
+            # canvas.scale(pball, (xr-xl)/2, (yr-yl)/2, 1.1, 1.1)
+            break
 
-	if len(foodcoordx) < 10:
-		placeFood()
-	# foodlenaft = len(foodcoordx)
-	# foodlendiff = foodlenbef - foodlenaft
-	
-		
-			
+        if len(foodcoordx) < 10:
+         placeFood()
 
-	# positions = []
-	# positions.append(canvas.coords(balls[0]))
-    # if positions[0][0] < 0:
-    #     canvas.coords(1,width,positions[0][1],width-snakeSize,positions[0][3])
-    # elif positions[0][2] > width:
-    #     canvas.coords(snake[0],0-snakeSize,positions[0][1],0,positions[0][3])
-    # elif positions[0][3] > height:
-    #     canvas.coords(snake[0],positions[0][0],0 - snakeSize,positions[0][2],0)
-    # elif positions[0][1] < 0:
-    #     canvas.coords(snake[0],positions[0][0], height,positions[0][2],height-snakeSize)
-    # positions.clear()
-    # positions.append(canvas.coords(snake[0]))
-	if direction == "left":
-		if xl > 10:
-		    canvas.move(pball, -30,0)
-		    xl -= 30
-		    xr -= 30
-	elif direction == "right":
-	    if xr < 1270:
-		    canvas.move(pball, 30,0)
-		    xl += 30
-		    xr += 30
-	elif direction == "up":
-		if yl > 10:
-		    canvas.move(pball, 0,-30)
-		    yl -= 30
-		    yr -= 30
-	elif direction == "down":
-		if yr < 710:
-		    canvas.move(pball, 0,30)
-		    yl += 30
-		    yr += 30
-	# bHeadPos = canvas.coords(balls[0])
-	# foodPos = canvas.coords(food)
-	# if overlapping(bHeadPos, foodPos):
-	# 	messagebox.showinfo(title='Game Over', message='You touched an object！')
+        if direction == "left":
+         if xl > 10:
+            canvas.move(pball, -30,0)
+            xl -= 30
+            xr -= 30
+        elif direction == "right":
+            if xr < 1270:
+             canvas.move(pball, 30,0)
+             xl += 30
+             xr += 30
+        elif direction == "up":
+            if yl > 10:
+             canvas.move(pball, 0,-30)
+             yl -= 30
+             yr -= 30
+        elif direction == "down":
+            if yr < 710:
+             canvas.move(pball, 0,30)
+             yl += 30
+             yr += 30
 
-        # moveFood()
-        # growSnake()
-    # for i in range(1,len(pball)):
-    #     if overlapping(sHeadPos, canvas.coords(snake[i])):
-    #         gameOver = True
-    #         canvas.create_text(width/2,height/2,fill="white",font="Times 20 italic bold", text="Game Over!")
-	for i in range(1,len(balls)):
-		positions.append(canvas.coords(balls[i]))
-	for i in range(len(balls)-1):
-		canvas.coords(balls[i+1],positions[i][0], positions[i][1],positions[i][2],positions[i][3])
-	
-	canvas.after(90, moveBall)
+        #     if overlapping(sHeadPos, canvas.coords(snake[i])):
+        #         gameOver = True
+        #         canvas.create_text(width/2,height/2,fill="white",font="Times 20 italic bold", text="Game Over!")
+        for i in range(1,len(balls)):
+         positions.append(canvas.coords(balls[i]))
+        for i in range(len(balls)-1):
+         canvas.coords(balls[i+1],positions[i][0], positions[i][1],positions[i][2],positions[i][3])
 
-    # for i in range(1,len(snake)):
-    #     positions.append(canvas.coords(snake[i]))
-    # for i in range(len(snake)-1):
-    #     canvas.coords(snake[i+1],positions[i][0], positions[i][1],positions[i][2],positions[i][3])
-    # if 'gameOver' not in locals():
+        canvas.after(90, moveBall)
+
+        # for i in range(1,len(snake)):
+        #     positions.append(canvas.coords(snake[i]))
+        # for i in range(len(snake)-1):
+        #     canvas.coords(snake[i+1],positions[i][0], positions[i][1],positions[i][2],positions[i][3])
+        # if 'gameOver' not in locals():
 
 def hide(event):
     global hider
@@ -338,8 +334,17 @@ def hide(event):
 
 
 def call_back(event):
-	global call_back
-	print(event.keysym)
+    global call_back, pause, pausemsg
+    # print(event.keysym)
+    if event.keysym == "p":
+
+        if pause == 0:
+            pause = 1
+            pausemsg = canvas.create_text( 1280/2 , 720/2 , fill="white" , font="Times 20 italic bold", text="The Game Is Paused, Press P to return." )
+        else:
+            canvas.delete(pausemsg)
+            pause = 0
+
 
 def placeFood():
     global food, foodX, foodY, foodcoordx, foodcoordy, start
@@ -406,6 +411,8 @@ downb = []
 rightb = []
 upb = []
 leftb = []
+
+pause = 0
 
 e = Entry(mainwindow, show=None, font=('Arial', 14), textvariable=playername).place(x=600, y=250, anchor='nw')
 # playername.set('you hit me')
