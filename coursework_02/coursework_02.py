@@ -14,7 +14,7 @@ def start():
       if up.get()=='' or down.get()=='' or left.get()=='' or right.get()=='' or up.get()==' ' or down.get()==' ' or left.get()==' ' or right.get()==' ':
         messagebox.showinfo(title='Ooops! Please Check the Following...', message='Please Set Your Customary Control Keys(CCKs) or the Keys are setted illegally！')
       else:
-        global canvas, pball, direction, balls, foodcoord, xl, yl, xr, yr, scoreText, score, start, xy, countdown, timermsg
+        global canvas, pball, direction, balls, foodcoord, xl, yl, xr, yr, scoreText, score, start, xy, countdown, timermsg, killer, xlg, ylg, xrg, yrg, directiong
 
         canvas = Canvas(mainwindow, width=1280, height=720)
         canvas.pack()
@@ -28,9 +28,16 @@ def start():
         yl=xy[1]
         xr=xy[2]
         yr=xy[3]
-        # print(xy[0])
-        pball=canvas.create_oval(xy, fill="green", activefill="red")
-        balls.append(pball)
+        pball = canvas.create_oval(xy, fill="green")
+
+        directiong = rand(0, 3)
+
+        xlg = rand(100, 800)
+        ylg = xlg + 300
+        xrg = xlg + 100
+        yrg = xlg + 400
+        killerxy = (xlg,ylg,xrg,yrg)
+        killer=canvas.create_oval(killerxy, fill="orange")
 
         player = canvas.create_text( 1280/2-200 , 10 , fill="white" , font="Times 20 italic bold", text="PLAYER: " + playername.get())
         canvas.config(bg="black")
@@ -66,15 +73,80 @@ def start():
         # print(foodcoord)
 
         canvas.after(90, moveBall)
+        canvas.after(1000, movekiller)
         # print(str(balls[0]))
         # moveBall()
         # sleep(5)
         # canvas.destroy()
 
+def movekiller():
+    global killer, xlg, ylg, xrg, yrg, directiong, countdown
+    
+    if countdown != 0:
+        if directiong == 0 :#"left"
+            if xlg > 10:
+                canvas.move(killer, -30,0)
+                xlg -= 30
+                xrg -= 30
+            else:
+                canvas.delete(killer)
+                xlg = rand(100, 800)
+                ylg = xlg + 300
+                xrg = xlg + 100
+                yrg = xlg + 400
+                killerxy = (xlg,ylg,xrg,yrg)
+                killer=canvas.create_oval(killerxy, fill="orange")
+                directiong = rand(0, 3)
+        elif directiong == 1: #"right"
+            if xrg < 1270:
+                canvas.move(killer, 30,0)
+                xlg += 30
+                xrg += 30
+            else:
+                canvas.delete(killer)
+                xlg = rand(100, 800)
+                ylg = xlg + 300
+                xrg = xlg + 100
+                yrg = xlg + 400
+                killerxy = (xlg,ylg,xrg,yrg)
+                killer=canvas.create_oval(killerxy, fill="orange")
+                directiong = rand(0, 3)
+        elif directiong == 2: #"up"
+            if ylg > 10:
+                canvas.move(killer, 0,-30)
+                ylg -= 30
+                yrg -= 30
+            else:
+                canvas.delete(killer)
+                xlg = rand(100, 800)
+                ylg = xlg + 300
+                xrg = xlg + 100
+                yrg = xlg + 400
+                killerxy = (xlg,ylg,xrg,yrg)
+                killer=canvas.create_oval(killerxy, fill="orange")
+                directiong = rand(0, 3)
+        elif directiong == 3: #"down"
+            if yrg < 710:
+                canvas.move(killer, 0,30)
+                ylg += 30
+                yrg += 30
+            else:
+                canvas.delete(killer)
+                xlg = rand(100, 800)
+                ylg = xlg + 300
+                xrg = xlg + 100
+                yrg = xlg + 400
+                killerxy = (xlg,ylg,xrg,yrg)
+                killer=canvas.create_oval(killerxy, fill="orange")
+                directiong = rand(0, 3)
+    canvas.after(90, movekiller)
+
+
 
 def timer():
-        global countdown, foodcoordx, foodcoordy, xl, xr, yr, yl, growth, pball
+        global countdown, foodcoordx, foodcoordy, xl, xr, yr, yl, growth, pball, directiong
         if countdown > 0:
+            # boom()
             for i in range (len(foodcoordx)):
                 if foodcoordx[i]-(xl+xr)/2 <= (xr-xl)/2 and foodcoordx[i]-(xl+xr)/2 >= -(xr-xl)/2 and foodcoordy[i]-(yl+yr)/2 <= (yr-yl)/2 and foodcoordy[i]-(yl+yr)/2 >= -(yr-yl)/2:
                     break
@@ -82,7 +154,7 @@ def timer():
                      if i == len(foodcoordx)-1:
 
                       growth = -0.2
-                      if xr-xl <= 20:
+                      if xr-xl <= 35:
                        break
                       else:
                        canvas.delete(pball)
@@ -92,17 +164,37 @@ def timer():
                        yl=xy[1]
                        xr=xy[2]
                        yr=xy[3]
-                       pball=canvas.create_oval(xy, fill="green", activefill="red")
+                       pball=canvas.create_oval(xy, fill="green")
                        break
 
 
             canvas.itemconfigure(timermsg, text="Time Remaining for Next Update: "+str(countdown))
             countdown -= 1
         else:
+            # boomdir()
+            directiong = rand(0, 3)
             countdown = 30
         canvas.after(1000, timer)
 
-            
+ # newfile=open(newfilename+'.txt','w')          
+
+# def boom():
+#     global xlg, ylg, xrg, yrg, downb, upb, leftb, rightb
+#     lftb = canvas.create_oval((xlg-(xrg-xlg)/2, ylg+(yrg-ylg)/2, xrg-xlg, yrg), fill="blue")
+
+
+
+
+
+# def boomdir():
+#     global killer, xlg, ylg, xrg, yrg
+#     canvas.delete(killer)
+#     xlg = rand(100, 800)
+#     ylg = xlg + 300
+#     xrg = xlg + 100
+#     yrg = xlg + 400
+#     killerxy = (xlg,ylg,xrg,yrg)
+#     killer=canvas.create_oval(killerxy, fill="orange")
 
 
 def zoomer(event):
@@ -153,7 +245,7 @@ def moveBall():
 			canvas.delete(pball)
 			balls = []
 
-			growth = 0.3
+			growth = 0.6
 
 			xy = (xl -growth,yl -growth,xr +growth,yr +growth)
 			# xy = (1280/2 -growth,720/2 -growth,1280/2 +growth,720/2 +growth)
@@ -163,7 +255,7 @@ def moveBall():
 			xr=xy[2]
 			yr=xy[3]
 			# print(xy[0])
-			pball=canvas.create_oval(xy, fill="green", activefill="red")
+			pball=canvas.create_oval(xy, fill="green")
 			balls.append(pball)
 			# canvas.scale(pball, (xr-xl)/2, (yr-yl)/2, 1.1, 1.1)
 			break
@@ -309,6 +401,11 @@ left.set("a")
 
 right = StringVar()
 right.set("d")
+
+downb = []
+rightb = []
+upb = []
+leftb = []
 
 e = Entry(mainwindow, show=None, font=('Arial', 14), textvariable=playername).place(x=600, y=250, anchor='nw')
 # playername.set('you hit me')
