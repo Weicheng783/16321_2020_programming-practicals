@@ -56,6 +56,8 @@ def start():
 
         canvas.bind("<h>", hide)
 
+        
+
         canvas.bind("<"+left.get()+">", leftKey)
         canvas.bind("<"+right.get()+">", rightKey)
         canvas.bind("<"+up.get()+">", upKey)
@@ -82,6 +84,10 @@ def start():
         # sleep(5)
         # canvas.destroy()
 
+
+
+
+
 def pause(event):
     global pause, pausemsg
     if pause == 0:
@@ -93,7 +99,7 @@ def pause(event):
 
 
 def movekiller():
-    global killer, xlg, ylg, xrg, yrg, directiong, countdown, xl, xr, yl, yr, pause, end, leaderfile, score, start, firsttime
+    global killer, xlg, ylg, xrg, yrg, directiong, countdown, xl, xr, yl, yr, pause, end, leaderfile, score, start, firsttime, movspeed
     if pause == 1:
         canvas.after(90, movekiller)
     elif end == 1:
@@ -147,8 +153,8 @@ def movekiller():
             if directiong == 0 :#"left"
                 if xlg > 10:
                     canvas.move(killer, -30,0)
-                    xlg -= 30
-                    xrg -= 30
+                    xlg -= movspeed
+                    xrg -= movspeed
                 else:
                     canvas.delete(killer)
                     xlg = rand(100, 800)
@@ -161,8 +167,8 @@ def movekiller():
             elif directiong == 1: #"right"
                 if xrg < 1270:
                     canvas.move(killer, 30,0)
-                    xlg += 30
-                    xrg += 30
+                    xlg += movspeed
+                    xrg += movspeed
                 else:
                     canvas.delete(killer)
                     xlg = rand(100, 800)
@@ -175,8 +181,8 @@ def movekiller():
             elif directiong == 2: #"up"
                 if ylg > 10:
                     canvas.move(killer, 0,-30)
-                    ylg -= 30
-                    yrg -= 30
+                    ylg -= movspeed
+                    yrg -= movspeed
                 else:
                     canvas.delete(killer)
                     xlg = rand(100, 800)
@@ -189,8 +195,8 @@ def movekiller():
             elif directiong == 3: #"down"
                 if yrg < 710:
                     canvas.move(killer, 0,30)
-                    ylg += 30
-                    yrg += 30
+                    ylg += movspeed
+                    yrg += movspeed
                 else:
                     canvas.delete(killer)
                     xlg = rand(100, 800)
@@ -205,7 +211,7 @@ def movekiller():
 
 
 def timer():
-        global countdown, foodcoordx, foodcoordy, xl, xr, yr, yl, growth, pball, directiong, pause, end
+        global countdown, foodcoordx, foodcoordy, xl, xr, yr, yl, growth, pball, directiong, pause, end, movspeed
 
         if pause == 1 or end == 1:
             canvas.after(90, timer)
@@ -239,6 +245,7 @@ def timer():
                 # boomdir()
                 directiong = rand(0, 3)
                 countdown = 30
+                movspeed += 15
             canvas.after(1000, timer)
 
  # newfile=open(newfilename+'.txt','w')          
@@ -272,9 +279,10 @@ def timer():
 
 
 def leaderboard():
-    global leaderfile, leaders, end
+    global leaderfile, leaders, end, movspeed
     if end == 1:
         end = 0
+        movspeed = 30
 
 
     if not os.path.isfile('leader.ini'):
@@ -413,7 +421,7 @@ def hide(event):
         # canvas.delete(bosskeydis)
 
 def call_back(event):
-    global call_back, pause, pausemsg
+    global call_back, pause, pausemsg, score, movspeed
     # print(event.keysym)
     if event.keysym == "p":
 
@@ -436,6 +444,12 @@ def call_back(event):
         else:
             canvas.delete(pausemsg)
             pause = 0
+    elif event.keysym == 'c':
+        score += 50
+        if movspeed >= 15:
+         movspeed -= 5
+
+
 
 def placeFood():
     global food, foodX, foodY, foodcoordx, foodcoordy, start
@@ -506,6 +520,8 @@ upb = []
 leftb = []
 
 firsttime = 1
+
+movspeed = 30
 
 pause = 0
 end = 0
