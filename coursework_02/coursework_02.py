@@ -1,4 +1,5 @@
 # Resolution: 1280 x 720
+import os, configparser
 from tkinter import Tk, Canvas, IntVar, Label, PhotoImage, StringVar, Entry, Button, messagebox
 from random import randint as rand
 from time import sleep
@@ -92,11 +93,17 @@ def pause(event):
 
 
 def movekiller():
-    global killer, xlg, ylg, xrg, yrg, directiong, countdown
-    if pause == 1:
+    global killer, xlg, ylg, xrg, yrg, directiong, countdown, xl, xr, yl, yr, pause, end
+    if pause == 1 or end == 1:
         canvas.after(90, movekiller)
     else:
         if countdown != 0:
+            if xlg-(xl+xr)/2 <= (xr-xl)/2 and xlg-(xl+xr)/2 >= -(xr-xl)/2 and ylg-(yl+yr)/2 <= (yr-yl)/2 and ylg-(yl+yr)/2 >= -(yr-yl)/2:
+                end = 1
+                messagebox.showinfo(title='Ooops!', message=' Your ball is touched the Killer Ball, Game Over!')
+                
+
+
             if directiong == 0 :#"left"
                 if xlg > 10:
                     canvas.move(killer, -30,0)
@@ -158,9 +165,9 @@ def movekiller():
 
 
 def timer():
-        global countdown, foodcoordx, foodcoordy, xl, xr, yr, yl, growth, pball, directiong, pause
+        global countdown, foodcoordx, foodcoordy, xl, xr, yr, yl, growth, pball, directiong, pause, end
 
-        if pause == 1:
+        if pause == 1 or end == 1:
             canvas.after(90, timer)
         else:
             if countdown > 0:
@@ -224,22 +231,22 @@ def timer():
 # 			canvas.configure(scrollregion = canvas.bbox("all"))
 
 
-def growSnake():
-    global score
-    score += 10
-    txt = "score:" + str(score)
-    canvas.itemconfigure(scoreText, text=txt)
-    lastElement = len(snake)-1
-    lastElementPos = canvas.coords(snake[lastElement])
-    snake.append(canvas.create_rectangle(0,0, snakeSize,snakeSize, fill="#FDF3F3"))
-    if (direction == "left"):
-        canvas.coords(snake[lastElement+1],lastElementPos[0]+snakeSize,lastElementPos[1],lastElementPos[2]+snakeSize,lastElementPos[3])
-    elif (direction == "right"):
-        canvas.coords(snake[lastElement+1],lastElementPos[0] -snakeSize,lastElementPos[1],lastElementPos[2] -snakeSize,lastElementPos[3])
-    elif (direction == "up"):
-        canvas.coords(snake[lastElement+1],lastElementPos[0],lastElementPos[1]+snakeSize,lastElementPos[2],lastElementPos[3]+snakeSize)
-    else:
-        canvas.coords(snake[lastElement+1],lastElementPos[0],lastElementPos[1]-snakeSize,lastElementPos[2],lastElementPos[3]-snakeSize)
+# def growSnake():
+#     global score
+#     score += 10
+#     txt = "score:" + str(score)
+#     canvas.itemconfigure(scoreText, text=txt)
+#     lastElement = len(snake)-1
+#     lastElementPos = canvas.coords(snake[lastElement])
+#     snake.append(canvas.create_rectangle(0,0, snakeSize,snakeSize, fill="#FDF3F3"))
+#     if (direction == "left"):
+#         canvas.coords(snake[lastElement+1],lastElementPos[0]+snakeSize,lastElementPos[1],lastElementPos[2]+snakeSize,lastElementPos[3])
+#     elif (direction == "right"):
+#         canvas.coords(snake[lastElement+1],lastElementPos[0] -snakeSize,lastElementPos[1],lastElementPos[2] -snakeSize,lastElementPos[3])
+#     elif (direction == "up"):
+#         canvas.coords(snake[lastElement+1],lastElementPos[0],lastElementPos[1]+snakeSize,lastElementPos[2],lastElementPos[3]+snakeSize)
+#     else:
+#         canvas.coords(snake[lastElement+1],lastElementPos[0],lastElementPos[1]-snakeSize,lastElementPos[2],lastElementPos[3]-snakeSize)
 
 def overlapping(a,b):
     if a[0] < b[2] and a[2] > b[0] and a[1] < b[3] and a[3] > b[1]:
@@ -247,8 +254,8 @@ def overlapping(a,b):
     return False
 
 def moveBall():
-    global moveBall, direction, balls, xl, yl, xr, yr, food, score, scoreText, pball, growth, xy, pause
-    if pause == 1:
+    global moveBall, direction, balls, xl, yl, xr, yr, food, score, scoreText, pball, growth, xy, pause, end
+    if pause == 1 or end == 1:
      canvas.after(90, moveBall)
     else:
         canvas.pack()
@@ -338,8 +345,6 @@ def hide(event):
 
         # canvas.delete(bosskeydis)
 
-
-
 def call_back(event):
     global call_back, pause, pausemsg
     # print(event.keysym)
@@ -351,7 +356,19 @@ def call_back(event):
         else:
             canvas.delete(pausemsg)
             pause = 0
-
+    elif event.keysym == "n":
+        if pause == 0:
+            pause = 1
+            gamesaver.write(open('config.ini','w'))
+            # newfile.write('< Statistics Summary >\n'+'the total number of words :')
+            gamesaver.add_section('db')
+            gamesaver.set("db", "db_pass", "xgmtest")
+            # gamesaver.close()
+            print(gamesaver.get("db", "db_pass"))
+            pausemsg = canvas.create_text( 1280/2 , 720/2 , fill="white" , font="Times 20 italic bold", text="Game saved successfully, Press N to return." )
+        else:
+            canvas.delete(pausemsg)
+            pause = 0
 
 def placeFood():
     global food, foodX, foodY, foodcoordx, foodcoordy, start
@@ -420,6 +437,9 @@ upb = []
 leftb = []
 
 pause = 0
+end = 0
+
+gamesaver = configparser.ConfigParser()
 
 e = Entry(mainwindow, show=None, font=('Arial', 14), textvariable=playername).place(x=600, y=250, anchor='nw')
 # playername.set('you hit me')
