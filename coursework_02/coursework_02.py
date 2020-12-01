@@ -15,7 +15,7 @@ def start():
       if up.get()=='' or down.get()=='' or left.get()=='' or right.get()=='' or up.get()==' ' or down.get()==' ' or left.get()==' ' or right.get()==' ':
         messagebox.showinfo(title='Ooops! Please Check the Following...', message='Please Set Your Customary Control Keys(CCKs) or the Keys are setted illegally！')
       else:
-        global canvas, pball, direction, balls, foodcoord, xl, yl, xr, yr, scoreText, score, start, xy, countdown, timermsg, killer, xlg, ylg, xrg, yrg, directiong
+        global canvas, starttimer, pball, direction, balls, foodcoord, xl, yl, xr, yr, scoreText, score, start, xy, countdown, timermsg, killer, xlg, ylg, xrg, yrg, directiong
 
         canvas = Canvas(mainwindow, width=1280, height=720)
         canvas.pack()
@@ -93,15 +93,55 @@ def pause(event):
 
 
 def movekiller():
-    global killer, xlg, ylg, xrg, yrg, directiong, countdown, xl, xr, yl, yr, pause, end
-    if pause == 1 or end == 1:
+    global killer, xlg, ylg, xrg, yrg, directiong, countdown, xl, xr, yl, yr, pause, end, leaderfile, score, start, firsttime
+    if pause == 1:
         canvas.after(90, movekiller)
+    elif end == 1:
+        canvas.destroy()
+        leaderboard()
+
     else:
         if countdown != 0:
             if xlg-(xl+xr)/2 <= (xr-xl)/2 and xlg-(xl+xr)/2 >= -(xr-xl)/2 and ylg-(yl+yr)/2 <= (yr-yl)/2 and ylg-(yl+yr)/2 >= -(yr-yl)/2:
-                end = 1
-                messagebox.showinfo(title='Ooops!', message=' Your ball is touched the Killer Ball, Game Over!')
+
+                # if not os.path.isfile('leader.ini'):
+                    # leaderfile = open('leader.ini','r')
+                # os.remove('leader.ini') # else:
+                # newfile=open('leader.ini','w')
+                # newfile.write('')
+                # newfile.close()
+                # os.remove('leader.ini')
+                if firsttime == 1:
+                    leaderfile.write(open('leader.ini','w'))
+                    leaderfile.add_section('total')
+                    leaderfile.set("total","total","1")
+                    leaderfile.set("total","1name","")
+                    leaderfile.set("total","1score","0")
+                    firsttime = 0
+                else:
+                    leaderfile.write(open('leader.ini','w'))
+                    # leaderfile.add_section('total')
+                    # leaderfile.set("total","total","1")
+                    # leaderfile.set("total","1name","")
+                    # leaderfile.set("total","1score","0")
                 
+
+            # else:
+
+
+                end = 1
+                # leaderfile.write(open('leader.ini','a'))
+                leadernum = leaderfile.get('total', 'total')
+                leaderfile.set('total', 'total', str(int(leadernum)+1))
+                leaderfile.set('total', str(int(leadernum)+1)+'name', playername.get())
+                leaderfile.set('total', str(int(leadernum)+1)+'score', str(score))
+                # leaderfile.close()
+                start = 0
+
+                messagebox.showinfo(title='Ooops!', message=' Your ball is touched the Killer Ball, Game Over! Game Score is saved now, maybe able to read though the leaderboard.')
+
+
+
 
 
             if directiong == 0 :#"left"
@@ -231,27 +271,54 @@ def timer():
 # 			canvas.configure(scrollregion = canvas.bbox("all"))
 
 
-# def growSnake():
-#     global score
-#     score += 10
-#     txt = "score:" + str(score)
-#     canvas.itemconfigure(scoreText, text=txt)
-#     lastElement = len(snake)-1
-#     lastElementPos = canvas.coords(snake[lastElement])
-#     snake.append(canvas.create_rectangle(0,0, snakeSize,snakeSize, fill="#FDF3F3"))
-#     if (direction == "left"):
-#         canvas.coords(snake[lastElement+1],lastElementPos[0]+snakeSize,lastElementPos[1],lastElementPos[2]+snakeSize,lastElementPos[3])
-#     elif (direction == "right"):
-#         canvas.coords(snake[lastElement+1],lastElementPos[0] -snakeSize,lastElementPos[1],lastElementPos[2] -snakeSize,lastElementPos[3])
-#     elif (direction == "up"):
-#         canvas.coords(snake[lastElement+1],lastElementPos[0],lastElementPos[1]+snakeSize,lastElementPos[2],lastElementPos[3]+snakeSize)
-#     else:
-#         canvas.coords(snake[lastElement+1],lastElementPos[0],lastElementPos[1]-snakeSize,lastElementPos[2],lastElementPos[3]-snakeSize)
+def leaderboard():
+    global leaderfile, leaders, end
+    if end == 1:
+        end = 0
 
-def overlapping(a,b):
-    if a[0] < b[2] and a[2] > b[0] and a[1] < b[3] and a[3] > b[1]:
-        return True
-    return False
+
+    if not os.path.isfile('leader.ini'):
+        # leaderfile = open('leader.ini','r')
+    # else:
+        leaderfile.write(open('leader.ini','a'))
+        leaderfile.add_section('total')
+        leaderfile.set("total","total","1")
+        leaderfile.set("total","1name","")
+        leaderfile.set("total","1score","0")
+
+    leaders = Canvas(mainwindow, width=1280, height=720)
+    leaders.pack()
+    leaders.create_text( 1280/2 , 200 , fill="black" , font="Times 20 italic bold", text="L E A D E R B O A R D" )
+
+    highest = 1
+    for i in range(int(leaderfile.get('total','total'))):
+        if int(leaderfile.get('total',str(i+1)+'score')) >= int(leaderfile.get('total',str(highest)+'score')):
+            highest = i+1
+    leaders.create_text(1280/2 , 350 , fill="red" , font="Times 20 italic bold", text="1ST Position: "+leaderfile.get('total',str(highest)+'name')+"  Score: "+leaderfile.get('total',str(highest)+'score'))        
+    
+    secondpos = 1
+    for i in range(int(leaderfile.get('total','total'))):
+        if int(leaderfile.get('total',str(i+1)+'score')) >= int(leaderfile.get('total',str(secondpos)+'score')) and secondpos != highest:
+            secondpos = i + 1
+
+    leaders.create_text(1280/2 , 450 , fill="orange" , font="Times 20 italic bold", text="2ND Position: "+leaderfile.get('total',str(secondpos)+'name')+"  Score: "+leaderfile.get('total',str(secondpos)+'score')) 
+
+    thipos = 1
+    for i in range(int(leaderfile.get('total','total'))):
+        if int(leaderfile.get('total',str(i+1)+'score')) >= int(leaderfile.get('total',str(thipos)+'score')) and thipos != highest and thipos != secondpos:
+            secondpos = i + 1
+    leaders.create_text(1280/2 , 550 , fill="purple" , font="Times 20 italic bold", text="3RD Position: "+leaderfile.get('total',str(thipos)+'name')+"  Score: "+leaderfile.get('total',str(thipos)+'score')) 
+
+    # leaderfile.close()
+
+    Button(leaders, text='Back', font=('Arial', 15), width=10, height=1, command=destroyleader).place(x=1280/2, y=600, anchor='nw')
+
+
+
+def destroyleader():
+    global leaders
+    leaders.destroy()
+
 
 def moveBall():
     global moveBall, direction, balls, xl, yl, xr, yr, food, score, scoreText, pball, growth, xy, pause, end
@@ -315,10 +382,10 @@ def moveBall():
         #     if overlapping(sHeadPos, canvas.coords(snake[i])):
         #         gameOver = True
         #         canvas.create_text(width/2,height/2,fill="white",font="Times 20 italic bold", text="Game Over!")
-        for i in range(1,len(balls)):
-         positions.append(canvas.coords(balls[i]))
-        for i in range(len(balls)-1):
-         canvas.coords(balls[i+1],positions[i][0], positions[i][1],positions[i][2],positions[i][3])
+        # for i in range(1,len(balls)):
+        #  positions.append(canvas.coords(balls[i]))
+        # for i in range(len(balls)-1):
+        #  canvas.coords(balls[i+1],positions[i][0], positions[i][1],positions[i][2],positions[i][3])
 
         canvas.after(90, moveBall)
 
@@ -411,6 +478,8 @@ mainwindow = Tk()
 mainwindow.title("Battle Of Balls (adapted)")
 mainwindow.geometry('1280x720')
 
+
+
 Label(mainwindow,text='Battle Of Balls (adapted)', font=('Arial Bold', 20)).place(x=500, y=200, anchor='nw')
 Label(mainwindow,text='Please Type Your Name :', font=('Arial Bold', 15)).place(x=350, y=250, anchor='nw')
 
@@ -436,15 +505,20 @@ rightb = []
 upb = []
 leftb = []
 
+firsttime = 1
+
 pause = 0
 end = 0
 
 gamesaver = configparser.ConfigParser()
+leaderfile = configparser.ConfigParser()
+
 
 e = Entry(mainwindow, show=None, font=('Arial', 14), textvariable=playername).place(x=600, y=250, anchor='nw')
 # playername.set('you hit me')
-Button(mainwindow, text='Start !', font=('Arial', 12), width=10, height=1, command=start).place(x=600, y=350, anchor='nw')
+Button(mainwindow, text='Start !', font=('Arial', 15), width=10, height=1, command=start).place(x=600, y=350, anchor='nw')
 # User control
+# Button(mainwindow, text='Leaderboard', font=('Arial', 15), width=10, height=1, command=leaderboard).place(x=800, y=350, anchor='nw')
 Label(mainwindow,text='User Settings(Customary Control Keys):', font=('Arial Bold', 15)).place(x=500, y=720/2+50, anchor='nw')
 Label(mainwindow,text='UpKey :', font=('Arial Bold', 15)).place(x=450, y=440, anchor='nw')
 upk=Entry(mainwindow, show=None, font=('Arial', 14), textvariable=up).place(x=550, y=440, anchor='nw')
@@ -457,6 +531,18 @@ rightk=Entry(mainwindow, show=None, font=('Arial', 14), textvariable=right).plac
 Label(mainwindow,text='! Notice: The keys <Left> <Right> <Up> <Down> are kept unchanged intentationally afraid of the Customary Keys do not work.', font=('Arial Bold', 15)).place(x=40, y=570, anchor='nw')
 
 # bosskey = PhotoImage(file="python.png")
+if os.path.isfile('config.ini'):
+    configfile = open('config.ini','w')
+else:
+    configexist = 0
+
+
+# else:
+#     leaderfile = open('leader.ini','w')
+    # leaderfile.add_section('totalplayer')
+    # leaderfile.set("totalplayer", "1", "xgmtest")
+
+
 
 foodcoord=[]
 
