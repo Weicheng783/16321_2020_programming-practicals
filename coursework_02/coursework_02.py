@@ -6,7 +6,7 @@ from time import sleep
 
 
 def start():
-    # global start
+    global start
 
     if playername.get() == '':
         messagebox.showinfo(title='Ooops! Please Check the Following...', message='Please type your name correctly！')
@@ -15,7 +15,7 @@ def start():
       if up.get()=='' or down.get()=='' or left.get()=='' or right.get()=='' or up.get()==' ' or down.get()==' ' or left.get()==' ' or right.get()==' ':
         messagebox.showinfo(title='Ooops! Please Check the Following...', message='Please Set Your Customary Control Keys(CCKs) or the Keys are setted illegally！')
       else:
-        global canvas, starttimer, pball, direction, balls, foodcoord, xl, yl, xr, yr, scoreText, score, start, xy, countdown, timermsg, killer, xlg, ylg, xrg, yrg, directiong
+        global canvas, starttimer, pball, direction, balls, foodcoord, xl, yl, xr, yr, scoreText, score, start, xy, countdown, timermsg, killer, xlg, ylg, xrg, yrg, directiong, gamefromsave
 
         canvas = Canvas(mainwindow, width=1280, height=720)
         canvas.pack()
@@ -24,7 +24,19 @@ def start():
         starttimer = 0
 
         balls = []
-        xy = (1280/2 -50,720/2 -50,1280/2 +50,720/2 +50)
+        
+        if gamefromsave == 1:
+            file = open("posxl.txt")
+            file1 = open("posxr.txt")
+            file2 = open("posyl.txt")
+            file3 = open("posyr.txt")
+            xy = (float(file.read()),float(file2.read()),float(file1.read()),float(file3.read()))
+            file.close()
+            file1.close()
+            file2.close()
+            file3.close()
+        else:
+            xy = (1280/2 -50,720/2 -50,1280/2 +50,720/2 +50)
         xl=xy[0]
         yl=xy[1]
         xr=xy[2]
@@ -39,12 +51,29 @@ def start():
         yrg = xlg + 400
         killerxy = (xlg,ylg,xrg,yrg)
         killer=canvas.create_oval(killerxy, fill="orange")
+        if gamefromsave == 1:
+            file4 = open("name.txt")
+            player = canvas.create_text( 1280/2-200 , 10 , fill="white" , font="Times 20 italic bold", text="PLAYER: " + file4.read())
+            file4.close()
 
-        player = canvas.create_text( 1280/2-200 , 10 , fill="white" , font="Times 20 italic bold", text="PLAYER: " + playername.get())
-        canvas.config(bg="black")
-        score = 0
-        txt = "Score:" + str(score)
-        scoreText = canvas.create_text( 1280/2+50 , 10 , fill="white" , font="Times 20 italic bold", text=txt)
+            canvas.config(bg="black")
+
+            file5 = open("score.txt")
+            score = int(file5.read())
+            txt = "Score:" + str(score)
+            scoreText = canvas.create_text( 1280/2+50 , 10 , fill="white" , font="Times 20 italic bold", text=txt)
+            file5.close()
+
+        else:
+            player = canvas.create_text( 1280/2-200 , 10 , fill="white" , font="Times 20 italic bold", text="PLAYER: " + playername.get())
+            canvas.config(bg="black")
+            score = 0
+            txt = "Score:" + str(score)
+            scoreText = canvas.create_text( 1280/2+50 , 10 , fill="white" , font="Times 20 italic bold", text=txt)
+        
+
+
+
 
 
         canvas.bind("<Left>", leftKey)
@@ -224,7 +253,7 @@ def timer():
                     else:
                          if i == len(foodcoordx)-1:
 
-                          growth = -0.2
+                          growth = 0
                           if xr-xl <= 35:
                            break
                           else:
@@ -279,10 +308,11 @@ def timer():
 
 
 def leaderboard():
-    global leaderfile, leaders, end, movspeed
+    global leaderfile, leaders, end, movspeed, gamefromsave
     if end == 1:
         end = 0
         movspeed = 30
+        gamefromsave = 0
 
 
     if not os.path.isfile('leader.ini'):
@@ -348,7 +378,7 @@ def moveBall():
             canvas.delete(pball)
             balls = []
 
-            growth = 0.6
+            growth = 0
 
             xy = (xl -growth,yl -growth,xr +growth,yr +growth)
             # xy = (1280/2 -growth,720/2 -growth,1280/2 +growth,720/2 +growth)
@@ -413,34 +443,66 @@ def hide(event):
         shademsg = canvashade.create_text( 1280/2 , 720/2 , fill="black" , font="Times 20 italic bold", text="Welcome to Python, You Pressed a BOSS KEY! Press again to restore." )
         # mainwindow.withdraw()
         # bosskeydis = canvas.create_image(img=bosskey)
+
+        if os.path.isfile('python.png'):
+            photo = PhotoImage(file='python.png')
+            img_label = Label(canvashade, img=photo)
     else:
         hider=0
         pause=0
         canvashade.destroy()
 
+        
+
         # canvas.delete(bosskeydis)
 
 def call_back(event):
-    global call_back, pause, pausemsg, score, movspeed
+    global call_back, pause, pausemsg, score, movspeed, xl, xr, yl, yr
     # print(event.keysym)
     if event.keysym == "p":
 
         if pause == 0:
             pause = 1
-            pausemsg = canvas.create_text( 1280/2 , 720/2 , fill="white" , font="Times 20 italic bold", text="The Game Is Paused, Press P to return." )
+            pausemsg = canvas.create_text( 1280/2 , 720/2 , fill="white" , font="Times 20 italic bold", text="The Game Is Paused, Press <p> to return." )
         else:
             canvas.delete(pausemsg)
             pause = 0
-    elif event.keysym == "n":
+    elif event.keysym == "k":
         if pause == 0:
             pause = 1
-            gamesaver.write(open('config.ini','w'))
+            # gamesaver.write(open('config.ini','w'))
             # newfile.write('< Statistics Summary >\n'+'the total number of words :')
-            gamesaver.add_section('db')
-            gamesaver.set("db", "db_pass", "xgmtest")
+            # gamesaver.add_section('db')
+            # gamesaver.set("db", "db_pass", "xgmtest")
             # gamesaver.close()
-            print(gamesaver.get("db", "db_pass"))
-            pausemsg = canvas.create_text( 1280/2 , 720/2 , fill="white" , font="Times 20 italic bold", text="Game saved successfully, Press N to return." )
+            # print(gamesaver.get("db", "db_pass"))
+
+            newfile=open('name.txt','w')
+            newfile.write(playername.get())
+            newfile.close()
+
+            newfile=open('score.txt','w')
+            newfile.write(str(score))
+            newfile.close()
+
+            newfile=open('posxl.txt','w')
+            newfile.write(str(xl))
+            newfile.close()            
+            
+            newfile=open('posxr.txt','w')
+            newfile.write(str(xr))
+            newfile.close() 
+ 
+            newfile=open('posyl.txt','w')
+            newfile.write(str(yl))
+            newfile.close() 
+
+            newfile=open('posyr.txt','w')
+            newfile.write(str(yr))
+            newfile.close() 
+
+
+            pausemsg = canvas.create_text( 1280/2 , 720/2 , fill="white" , font="Times 20 italic bold", text="Game saved successfully, Press <k> to return." )
         else:
             canvas.delete(pausemsg)
             pause = 0
@@ -486,6 +548,15 @@ def downKey(event):
     global direction
     direction = "down"
 
+def load():
+    global gamefromsave
+    if os.path.isfile('name.txt'):
+        gamefromsave = 1
+        start()
+    else:
+        messagebox.showinfo(title='Ooops!', message='You have not saved a game ! Please play a little bit the game and press <k> to save.')
+
+    
 
 mainwindow = Tk()
 
@@ -499,6 +570,8 @@ Label(mainwindow,text='Please Type Your Name :', font=('Arial Bold', 15)).place(
 
 playername = StringVar()
 playername.set("Harvey")
+
+gamefromsave = 0
 
 hider = 0
 
@@ -534,7 +607,7 @@ e = Entry(mainwindow, show=None, font=('Arial', 14), textvariable=playername).pl
 # playername.set('you hit me')
 Button(mainwindow, text='Start !', font=('Arial', 15), width=10, height=1, command=start).place(x=600, y=350, anchor='nw')
 # User control
-# Button(mainwindow, text='Leaderboard', font=('Arial', 15), width=10, height=1, command=leaderboard).place(x=800, y=350, anchor='nw')
+Button(mainwindow, text='Reload a Game from local', font=('Arial', 15), width=30, height=1, command=load).place(x=800, y=350, anchor='nw')
 Label(mainwindow,text='User Settings(Customary Control Keys):', font=('Arial Bold', 15)).place(x=500, y=720/2+50, anchor='nw')
 Label(mainwindow,text='UpKey :', font=('Arial Bold', 15)).place(x=450, y=440, anchor='nw')
 upk=Entry(mainwindow, show=None, font=('Arial', 14), textvariable=up).place(x=550, y=440, anchor='nw')
@@ -544,13 +617,9 @@ Label(mainwindow,text='LeftKey:', font=('Arial Bold', 15)).place(x=450, y=500, a
 leftk=Entry(mainwindow, show=None, font=('Arial', 14), textvariable=left).place(x=570, y=500, anchor='nw')
 Label(mainwindow,text='RightKey:', font=('Arial Bold', 15)).place(x=450, y=530, anchor='nw')
 rightk=Entry(mainwindow, show=None, font=('Arial', 14), textvariable=right).place(x=570, y=530, anchor='nw')
-Label(mainwindow,text='! Notice: The keys <Left> <Right> <Up> <Down> are kept unchanged intentationally afraid of the Customary Keys do not work.', font=('Arial Bold', 15)).place(x=40, y=570, anchor='nw')
+Label(mainwindow,text='! Notice: The keys <Left> <Right> <Up> <Down> are kept unchanged intentationally just in case the Customary Keys do not work.', font=('Arial Bold', 15)).place(x=40, y=570, anchor='nw')
 
 # bosskey = PhotoImage(file="python.png")
-if os.path.isfile('config.ini'):
-    configfile = open('config.ini','w')
-else:
-    configexist = 0
 
 
 # else:
