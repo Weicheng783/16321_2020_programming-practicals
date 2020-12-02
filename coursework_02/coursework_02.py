@@ -5,7 +5,7 @@ from random import randint as rand
 from time import sleep
 
 
-def start():
+def startgame():
     global start
 
     if playername.get() == '':
@@ -113,10 +113,6 @@ def start():
         # sleep(5)
         # canvas.destroy()
 
-
-
-
-
 def pause(event):
     global pause, pausemsg
     if pause == 0:
@@ -125,7 +121,6 @@ def pause(event):
     else:
         canvas.delete(pausemsg)
         pause = 0
-
 
 def movekiller():
     global killer, xlg, ylg, xrg, yrg, directiong, countdown, xl, xr, yl, yr, pause, end, leaderfile, score, start, firsttime, movspeed
@@ -137,47 +132,58 @@ def movekiller():
 
     else:
         if countdown != 0:
-            if xlg-(xl+xr)/2 <= (xr-xl)/2 and xlg-(xl+xr)/2 >= -(xr-xl)/2 and ylg-(yl+yr)/2 <= (yr-yl)/2 and ylg-(yl+yr)/2 >= -(yr-yl)/2:
+            if xrg-(xl+xr)/2 <= (xr-xl)/2 and xrg-(xl+xr)/2 >= -(xr-xl)/2 and yrg-(yl+yr)/2 <= (yr-yl)/2 and yrg-(yl+yr)/2 >= -(yr-yl)/2:
+            # if (xl <= xrg and yr >= yrg and yl <= ylg) or (yr >= ylg and xl <= xlg and xr >= xrg) or (xr >= xlg and yr >= yrg and yl <= ylg) or (yrg >= yl and xl <= xlg and xr >= xrg):
+                if not os.path.isfile('total.txt'):
+                    newfile = open('total.txt','w')
+                    newfile.write('1')
+                    newfile.close()
 
-                # if not os.path.isfile('leader.ini'):
-                    # leaderfile = open('leader.ini','r')
-                # os.remove('leader.ini') # else:
-                # newfile=open('leader.ini','w')
-                # newfile.write('')
-                # newfile.close()
-                # os.remove('leader.ini')
-                if firsttime == 1:
-                    leaderfile.write(open('leader.ini','w'))
-                    leaderfile.add_section('total')
-                    leaderfile.set("total","total","1")
-                    leaderfile.set("total","1name","")
-                    leaderfile.set("total","1score","0")
-                    firsttime = 0
-                else:
-                    leaderfile.write(open('leader.ini','w'))
-                    # leaderfile.add_section('total')
-                    # leaderfile.set("total","total","1")
-                    # leaderfile.set("total","1name","")
-                    # leaderfile.set("total","1score","0")
+                    newfile = open('1name.txt','w')
+                    newfile.write('Anonymous')
+                    newfile.close()                    
+
+                    newfile = open('1score.txt','w')
+                    newfile.write('50')
+                    newfile.close()
                 
+                if os.path.isfile('total.txt'):
+                    file = open('total.txt')
+                    total = int(file.read())
+                    file.close()
+                    file = open('total.txt','w')
+                    file.write(str(total+1))
+                    file.close()
 
-            # else:
+                    newfile = open(str(total+1)+'score.txt','w')
+                    newfile.write(str(score))
+                    newfile.close()
+
+                    newfile = open(str(total+1)+'name.txt','w')
+                    newfile.write(playername.get())
+                    newfile.close()
+                # if firsttime == 1:
+                #     leaderfile.write(open('leader.ini','w'))
+                #     leaderfile.add_section('total')
+                #     leaderfile.set("total","total","1")
+                #     leaderfile.set("total","1name","")
+                #     leaderfile.set("total","1score","0")
+                #     firsttime = 0
+                # else:
+                #     leaderfile.write(open('leader.ini','w'))
 
 
                 end = 1
-                # leaderfile.write(open('leader.ini','a'))
-                leadernum = leaderfile.get('total', 'total')
-                leaderfile.set('total', 'total', str(int(leadernum)+1))
-                leaderfile.set('total', str(int(leadernum)+1)+'name', playername.get())
-                leaderfile.set('total', str(int(leadernum)+1)+'score', str(score))
-                # leaderfile.close()
+
+
+                # leadernum = leaderfile.get('total', 'total')
+                # leaderfile.set('total', 'total', str(int(leadernum)+1))
+                # leaderfile.set('total', str(int(leadernum)+1)+'name', playername.get())
+                # leaderfile.set('total', str(int(leadernum)+1)+'score', str(score))
+
                 start = 0
 
                 messagebox.showinfo(title='Ooops!', message=' Your ball is touched the Killer Ball, Game Over! Game Score is saved now, maybe able to read though the leaderboard.')
-
-
-
-
 
             if directiong == 0 :#"left"
                 if xlg > 10:
@@ -237,8 +243,6 @@ def movekiller():
                     directiong = rand(0, 3)
         canvas.after(90, movekiller)
 
-
-
 def timer():
         global countdown, foodcoordx, foodcoordy, xl, xr, yr, yl, growth, pball, directiong, pause, end, movspeed
 
@@ -277,86 +281,100 @@ def timer():
                 movspeed += 15
             canvas.after(1000, timer)
 
- # newfile=open(newfilename+'.txt','w')          
-
-# def boom():
-#     global xlg, ylg, xrg, yrg, downb, upb, leftb, rightb
-#     lftb = canvas.create_oval((xlg-(xrg-xlg)/2, ylg+(yrg-ylg)/2, xrg-xlg, yrg), fill="blue")
-
-
-
-
-
-# def boomdir():
-#     global killer, xlg, ylg, xrg, yrg
-#     canvas.delete(killer)
-#     xlg = rand(100, 800)
-#     ylg = xlg + 300
-#     xrg = xlg + 100
-#     yrg = xlg + 400
-#     killerxy = (xlg,ylg,xrg,yrg)
-#     killer=canvas.create_oval(killerxy, fill="orange")
-
-
-# def zoomer(event):
-# 		global zoomer, xr, xl, yr, yl, pball, food
-# 		if (event.delta > 0):
-# 			canvas.scale("all", (xr-xl)/2, (yr-yl)/2, 1.1, 1.1)
-# 		elif (event.delta < 0):
-# 			canvas.scale("all", (xr-xl)/2, (yr-yl)/2, 0.9, 0.9)
-# 			canvas.configure(scrollregion = canvas.bbox("all"))
-
-
 def leaderboard():
     global leaderfile, leaders, end, movspeed, gamefromsave
     if end == 1:
         end = 0
-        movspeed = 30
+        movspeed = 50
         gamefromsave = 0
 
 
-    if not os.path.isfile('leader.ini'):
-        # leaderfile = open('leader.ini','r')
-    # else:
-        leaderfile.write(open('leader.ini','a'))
-        leaderfile.add_section('total')
-        leaderfile.set("total","total","1")
-        leaderfile.set("total","1name","")
-        leaderfile.set("total","1score","0")
+    if not os.path.isfile('total.txt'):
+        newfile = open('total.txt','w')
+        newfile.write('1')
+        newfile.close()
+
+        newfile = open('1name.txt','w')
+        newfile.write('Anonymous')
+        newfile.close()
+
+        newfile = open('1score.txt','w')
+        newfile.write('50')
+        newfile.close()
+
 
     leaders = Canvas(mainwindow, width=1280, height=720)
     leaders.pack()
     leaders.create_text( 1280/2 , 200 , fill="black" , font="Times 20 italic bold", text="L E A D E R B O A R D" )
 
-    highest = 1
-    for i in range(int(leaderfile.get('total','total'))):
-        if int(leaderfile.get('total',str(i+1)+'score')) >= int(leaderfile.get('total',str(highest)+'score')):
-            highest = i+1
-    leaders.create_text(1280/2 , 350 , fill="red" , font="Times 20 italic bold", text="1ST Position: "+leaderfile.get('total',str(highest)+'name')+"  Score: "+leaderfile.get('total',str(highest)+'score'))        
-    
-    secondpos = 1
-    for i in range(int(leaderfile.get('total','total'))):
-        if int(leaderfile.get('total',str(i+1)+'score')) >= int(leaderfile.get('total',str(secondpos)+'score')) and secondpos != highest:
-            secondpos = i + 1
+    if os.path.isfile('total.txt'):
+        file = open('total.txt')
+        totalnum = int(file.read())
+        file.close()
 
-    leaders.create_text(1280/2 , 450 , fill="orange" , font="Times 20 italic bold", text="2ND Position: "+leaderfile.get('total',str(secondpos)+'name')+"  Score: "+leaderfile.get('total',str(secondpos)+'score')) 
+        highest = 1
+        for i in range(totalnum):
+            filehighest = open(str(highest)+'score.txt')
+            filescore = open(str(i+1)+'score.txt')
 
-    thipos = 1
-    for i in range(int(leaderfile.get('total','total'))):
-        if int(leaderfile.get('total',str(i+1)+'score')) >= int(leaderfile.get('total',str(thipos)+'score')) and thipos != highest and thipos != secondpos:
-            secondpos = i + 1
-    leaders.create_text(1280/2 , 550 , fill="purple" , font="Times 20 italic bold", text="3RD Position: "+leaderfile.get('total',str(thipos)+'name')+"  Score: "+leaderfile.get('total',str(thipos)+'score')) 
+            if int(filescore.read()) >= int(filehighest.read()):
+                highest = i+1
+            filescore.close()
+            filehighest.close()
 
-    # leaderfile.close()
+        filehighest = open(str(highest)+'name.txt')
+        filehighest2 = open(str(highest)+'score.txt')
 
-    Button(leaders, text='Back', font=('Arial', 15), width=10, height=1, command=destroyleader).place(x=1280/2, y=600, anchor='nw')
+        leaders.create_text(1280/2 , 350 , fill="red" , font="Times 20 italic bold", text="1ST Position: "+filehighest.read()+"  Score: "+filehighest2.read())
+
+        filehighest.close()
+        filehighest2.close()       
+        
+        secondpos = 1
+        for i in range(totalnum):
+            filehighest = open(str(secondpos)+'score.txt')
+            filescore = open(str(i+1)+'score.txt')
+
+            if int(filescore.read()) >= int(filehighest.read()) and secondpos != highest:
+                secondpos = i+1
+
+            filescore.close()
+            filehighest.close()
+
+        
+        filehighest = open(str(secondpos)+'name.txt')
+        filehighest2 = open(str(secondpos)+'score.txt')
+
+        leaders.create_text(1280/2 , 450 , fill="orange" , font="Times 20 italic bold", text="2ND Position: "+filehighest.read()+"  Score: "+filehighest2.read()) 
+
+        filehighest.close()
+        filehighest2.close() 
+
+        thipos = 1
+        for i in range(totalnum):
+            filehighest = open(str(thipos)+'score.txt')
+            filescore = open(str(i+1)+'score.txt')
+
+            if int(filescore.read()) >= int(filehighest.read()) and secondpos != highest and thipos != secondpos:
+                thipos = i+1
+
+            filescore.close()
+            filehighest.close()
 
 
+        filehighest = open(str(thipos)+'name.txt')
+        filehighest2 = open(str(thipos)+'score.txt')
+
+        leaders.create_text(1280/2 , 550 , fill="purple" , font="Times 20 italic bold", text="3RD Position: "+filehighest.read()+"  Score: "+filehighest2.read()) 
+
+        filehighest.close()
+        filehighest2.close() 
+
+        Button(leaders, text='Back', font=('Arial', 15), width=10, height=1, command=destroyleader).place(x=1280/2, y=600, anchor='nw')
 
 def destroyleader():
     global leaders
     leaders.destroy()
-
 
 def moveBall():
     global moveBall, direction, balls, xl, yl, xr, yr, food, score, scoreText, pball, growth, xy, pause, end
@@ -511,8 +529,6 @@ def call_back(event):
         if movspeed >= 15:
          movspeed -= 5
 
-
-
 def placeFood():
     global food, foodX, foodY, foodcoordx, foodcoordy, start
     if start==1:
@@ -531,7 +547,6 @@ def placeFood():
  
     	canvas.move(food[i], foodX, foodY)
     	
-
 def leftKey(event):
     global direction
     direction = "left"
@@ -552,18 +567,15 @@ def load():
     global gamefromsave
     if os.path.isfile('name.txt'):
         gamefromsave = 1
-        start()
+        startgame()
     else:
         messagebox.showinfo(title='Ooops!', message='You have not saved a game ! Please play a little bit the game and press <k> to save.')
 
-    
 
 mainwindow = Tk()
 
 mainwindow.title("Battle Of Balls (adapted)")
 mainwindow.geometry('1280x720')
-
-
 
 Label(mainwindow,text='Battle Of Balls (adapted)', font=('Arial Bold', 20)).place(x=500, y=200, anchor='nw')
 Label(mainwindow,text='Please Type Your Name :', font=('Arial Bold', 15)).place(x=350, y=250, anchor='nw')
@@ -602,10 +614,9 @@ end = 0
 gamesaver = configparser.ConfigParser()
 leaderfile = configparser.ConfigParser()
 
-
 e = Entry(mainwindow, show=None, font=('Arial', 14), textvariable=playername).place(x=600, y=250, anchor='nw')
 # playername.set('you hit me')
-Button(mainwindow, text='Start !', font=('Arial', 15), width=10, height=1, command=start).place(x=600, y=350, anchor='nw')
+Button(mainwindow, text='Start !', font=('Arial', 15), width=10, height=1, command=startgame).place(x=600, y=350, anchor='nw')
 # User control
 Button(mainwindow, text='Reload a Game from local', font=('Arial', 15), width=30, height=1, command=load).place(x=800, y=350, anchor='nw')
 Label(mainwindow,text='User Settings(Customary Control Keys):', font=('Arial Bold', 15)).place(x=500, y=720/2+50, anchor='nw')
@@ -619,21 +630,7 @@ Label(mainwindow,text='RightKey:', font=('Arial Bold', 15)).place(x=450, y=530, 
 rightk=Entry(mainwindow, show=None, font=('Arial', 14), textvariable=right).place(x=570, y=530, anchor='nw')
 Label(mainwindow,text='! Notice: The keys <Left> <Right> <Up> <Down> are kept unchanged intentationally just in case the Customary Keys do not work.', font=('Arial Bold', 15)).place(x=40, y=570, anchor='nw')
 
-# bosskey = PhotoImage(file="python.png")
-
-
-# else:
-#     leaderfile = open('leader.ini','w')
-    # leaderfile.add_section('totalplayer')
-    # leaderfile.set("totalplayer", "1", "xgmtest")
-
-
-
 foodcoord=[]
-
-
-
-
 mainwindow.mainloop()
 
 
