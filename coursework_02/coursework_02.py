@@ -10,7 +10,6 @@ def startgame():
 
     if playername.get() == '':
         messagebox.showinfo(title='Ooops! Please Check the Following...', message='Please type your name correctly！')
-        # playername.set('you hit me')
     else:
       if up.get()=='' or down.get()=='' or left.get()=='' or right.get()=='' or up.get()==' ' or down.get()==' ' or left.get()==' ' or right.get()==' ':
         messagebox.showinfo(title='Ooops! Please Check the Following...', message='Please Set Your Customary Control Keys(CCKs) or the Keys are setted illegally！')
@@ -25,6 +24,7 @@ def startgame():
 
         balls = []
 
+        # check whether Game from saved files
         if gamefromsave == 1:
             file = open("posxl.txt")
             file1 = open("posxr.txt")
@@ -74,8 +74,6 @@ def startgame():
         canvas.create_text( 1280/2-80 , 700 , fill="yellow" , font="Times 20 italic bold", text="<p> to pause, <k> to save, <b> is the Boss Key, <c> to cheat")
         canvas.create_text( 1280/2-80 , 670 , fill="blue" , font="Times 20 italic bold", text="when GreenBall touched the Middle of the OrangeBall, Game Over.")
 
-
-
         canvas.bind("<Left>", leftKey)
         canvas.bind("<Right>", rightKey)
         canvas.bind("<Up>", upKey)
@@ -85,7 +83,7 @@ def startgame():
 
         canvas.bind("<b>", hide)
 
-
+        # User Controls
         canvas.bind("<"+left.get()+">", leftKey)
         canvas.bind("<"+right.get()+">", rightKey)
         canvas.bind("<"+up.get()+">", upKey)
@@ -94,6 +92,7 @@ def startgame():
         canvas.focus_set()
         direction = "right"
 
+        # Food Generate and Timer start
         placeFood()
         canvas.bind("<KeyPress>", call_back)
         if starttimer == 0:
@@ -115,6 +114,7 @@ def pause(event):
         canvas.delete(pausemsg)
         pause = 0
 
+# The following controls the KillerBall movements.
 def movekiller():
     global killer, xlg, ylg, xrg, yrg, directiong, countdown, xl, xr, yl, yr, pause, end, leaderfile, score, start, firsttime, movspeed
     if pause == 1:
@@ -126,7 +126,7 @@ def movekiller():
     else:
         if countdown != 0:
             if xrg-(xl+xr)/2 <= (xr-xl)/2 and xrg-(xl+xr)/2 >= -(xr-xl)/2 and yrg-(yl+yr)/2 <= (yr-yl)/2 and yrg-(yl+yr)/2 >= -(yr-yl)/2:
-
+                # When the game is over, do some file writing stuff (Record the score, name).
                 if not os.path.isfile('total.txt'):
                     newfile = open('total.txt','w')
                     newfile.write('1')
@@ -220,6 +220,7 @@ def movekiller():
                     directiong = rand(0, 3)
         canvas.after(90, movekiller)
 
+# Timer or Counter
 def timer():
         global countdown, foodcoordx, foodcoordy, xl, xr, yr, yl, growth, pball, directiong, pause, end, movspeed
 
@@ -228,6 +229,7 @@ def timer():
         else:
             if countdown > 0:
                 for i in range (len(foodcoordx)):
+                    # if the two balls are collided.
                     if foodcoordx[i]-(xl+xr)/2 <= (xr-xl)/2 and foodcoordx[i]-(xl+xr)/2 >= -(xr-xl)/2 and foodcoordy[i]-(yl+yr)/2 <= (yr-yl)/2 and foodcoordy[i]-(yl+yr)/2 >= -(yr-yl)/2:
                         break
                     else:
@@ -250,11 +252,13 @@ def timer():
                 canvas.itemconfigure(timermsg, text="Time Remaining for Next Update: "+str(countdown))
                 countdown -= 1
             else:
+                # When the clock is 0, reset the clock to 30, meanwhile level up a bit.
                 directiong = rand(0, 3)
                 countdown = 30
                 movspeed += 15
             canvas.after(1000, timer)
 
+# The following is the leaderboard section, it is executed at the end of the game.
 def leaderboard():
     global leaderfile, leaders, end, movspeed, gamefromsave
     if end == 1:
@@ -346,6 +350,7 @@ def destroyleader():
     global leaders
     leaders.destroy()
 
+# The following controls the User Ball movement.
 def moveBall():
     global moveBall, direction, balls, xl, yl, xr, yr, food, score, scoreText, pball, growth, xy, pause, end
     if pause == 1 or end == 1:
@@ -402,6 +407,7 @@ def moveBall():
 
         canvas.after(90, moveBall)
 
+# Boss Key section
 def hide(event):
     global hider, pause, canvashade
     if hider == 0:
@@ -421,6 +427,7 @@ def hide(event):
         pause=0
         canvashade.destroy()
 
+# Pause, Save, Cheat sections
 def call_back(event):
     global call_back, pause, pausemsg, score, movspeed, xl, xr, yl, yr
 
@@ -468,6 +475,7 @@ def call_back(event):
         if movspeed >= 15:
          movspeed -= 5
 
+# Placefood section
 def placeFood():
     global food, foodX, foodY, foodcoordx, foodcoordy, start
     if start==1:
@@ -502,6 +510,7 @@ def downKey(event):
     global direction
     direction = "down"
 
+# Reload the game section.
 def load():
     global gamefromsave
     if os.path.isfile('name.txt'):
@@ -518,6 +527,7 @@ mainwindow.geometry('1280x720')
 Label(mainwindow,text='Battle Of Balls (adapted)', font=('Arial Bold', 20)).place(x=500, y=50, anchor='nw')
 Label(mainwindow,text='Please Type Your Name :', font=('Arial Bold', 15)).place(x=350, y=100, anchor='nw')
 
+# Initalise Important Data and Control Codes.
 playername = StringVar()
 playername.set("Harvey")
 
