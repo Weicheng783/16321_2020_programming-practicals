@@ -1,5 +1,5 @@
 # Resolution: 1280 x 720
-import os, configparser
+import os
 from tkinter import Tk, Canvas, IntVar, Label, PhotoImage, StringVar, Entry, Button, messagebox
 from random import randint as rand
 from time import sleep
@@ -116,7 +116,7 @@ def pause(event):
 
 # The following controls the KillerBall movements.
 def movekiller():
-    global killer, xlg, ylg, xrg, yrg, directiong, countdown, xl, xr, yl, yr, pause, end, leaderfile, score, start, firsttime, movspeed
+    global killer, xlg, ylg, xrg, yrg, directiong, countdown, xl, xr, yl, yr, pause, end, score, start, movspeed
     if pause == 1:
         canvas.after(90, movekiller)
     elif end == 1:
@@ -260,7 +260,7 @@ def timer():
 
 # The following is the leaderboard section, it is executed at the end of the game.
 def leaderboard():
-    global leaderfile, leaders, end, movspeed, gamefromsave
+    global leaders, end, movspeed, gamefromsave
     if end == 1:
         end = 0
         movspeed = 50
@@ -558,9 +558,6 @@ movspeed = 30
 
 pause = 0
 end = 0
-
-gamesaver = configparser.ConfigParser()
-leaderfile = configparser.ConfigParser()
 
 e = Entry(mainwindow, show=None, font=('Arial', 14), textvariable=playername).place(x=650, y=100, anchor='nw')
 
